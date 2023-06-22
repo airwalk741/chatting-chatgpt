@@ -1,34 +1,66 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ChatGPT and 파파고
 
-## Getting Started
+> ChatGPT와 파파고를 통해 웹 채팅을 구현해보자
 
-First, run the development server:
+- chatGPT만으로 채팅 웹을 구현하고자 했으나 영어에 특화 되어 있는 것 같아 파파고도 같이 사용한다.
+- 주요 로직
+  - `사용자 입력` => `영어 번역` => `chatGPT 요청` => `한글 번역`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+### [chatGPT](https://platform.openai.com/docs/quickstart/build-your-application)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- openai 설치
+  ```bash
+  npm install openai
+  ```
+- gpt 요청 보내기
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+  ```typescript
+  const params = {
+    prompt: "여기에 텍스트 입력하쇼.",
+    model: "text-davinci-003",
+    max_tokens: 10,
+    temperature: 0,
+  };
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+  const response = await axios({
+    url: "https://api.openai.com/v1/completions",
+    headers: {
+      Authorization: `Bearer ${OPEN_AI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      ...params,
+    },
+    method: "POST",
+  });
+  ```
 
-## Learn More
+### [파파고](https://developers.naver.com/docs/papago/papago-nmt-example-code.md#node-js)
 
-To learn more about Next.js, take a look at the following resources:
+- 파파고 한글 => 영어 번역하기
+  ```typescript
+  const res = await axios({
+    url: "https://openapi.naver.com/v1/papago/n2mt",
+    method: "POST",
+    headers: {
+      "X-Naver-Client-Id": PAPAGO_CLIENT_ID,
+      "X-Naver-Client-Secret": PAPAGO_CLIENT_SECRET,
+    },
+    data: {
+      source: "ko",
+      target: "en",
+      text: text,
+    },
+  });
+  ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 결과
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+![image-20230622183625550](README.assets/image-20230622183625550.png)
 
-## Deploy on Vercel
+- ㅋㅋ 뭔가 바보인가보다.
+- 잘되는 질문도 있고 아닌것도 있네.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 참고문서
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [chatGPT-post](https://medium.com/codingthesmartway-com-blog/how-to-use-openai-api-with-axios-and-javascript-dd917ab017bc)
